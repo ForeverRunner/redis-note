@@ -74,7 +74,38 @@
         * 与网络通信相关的功能：包括底层的TCP网络通信和客户端实现，Redis对TC网络通信的Socket连接、设置等操作进行了封装、封装后的函数在anet.h/anet.c中
         * 客户端在redis运行过程中也会被广泛使用，比如实例返回对去的数据，主从复制时主从库间传输数据，RedisCluster的切片实例通信等都会用到客户端，Redis将客户端的创建、消息回复等功能实现在了networking.c
     * 数据库数据类型操作
-      * 数据类型
-      * 数据库KV对的新增、查询、修改、删除等操作接口封装在db.c
-      * Redis优化内存是从：内存分配、内存回收、数据替换
-        * 内存分配方面
+        * 数据类型(底层数据结构：对应数据类型：对应源码文件)
+            * SDS:String:sds.h:sdc.h/sdsalloc.h
+            * 双向链表：List:adlist.h/adlist.c
+            * 压缩链表：List,Hash,Sorted Set:ziplist.h/ziplist.c
+            * QuickList:List,Hash,Sorted Set:quicklist.h/quicklist.c
+            * 整数列表:Set:intset.h/intset.c
+            * Zipmap:Hash:zipmap.h/zipmap.c
+            * 哈希表:Hash:dict.h/dict.c
+            * HyperLogLog:HyperLogLog:hyperloglog.c
+            * GeoHash:Geo:geo.h/geo.c,geohash.h/geohash.c,geohash_helper.h/geohash_helper.c
+            * 位图:位图：bitops.c
+            * Stream:时序数据：stream.h/t_stream.c
+        * 数据库KV对的新增、查询、修改、删除等操作接口封装在db.c
+        * Redis优化内存是从：内存分配、内存回收、数据替换
+            * 内存分配方面
+                * Redis支持不同的内存分配器，包括glibc库提供的默认分配器tcmalloc、第三方库提供的jemalloc,Redis把对内存分配器的封装实现在了zmalloc.h/zmalloc.c
+            * 内存回收上
+                * 支持设置过期key，并针对过期key可以使用不同删除策略，代码实现在expire.c;为了避免大量key删除回收内存，会对系统性能产生影响，在lazyfree.c实现了异步删除的功能
+            * 数据替换
+                * 如果内存满了，按照一定规则清除不需要的数据，实现的策略有多种，包括LRU/LFU，封装在evict.c中
+    * 高可靠性和高可扩展性（体现在对数据持久化，实现了主从复制机制，从而提供了故障恢复功能）
+      * 数据持久化实现（内存快照RDB和AOF日志）
+        * 内存快照，rdb.h/rdb.c
+        * AOF日志,aof.c
+        * 使用AOF或者RDB恢复时，RDB和AOF文件可能会因为所在服务器宕机而未能完整保存，所以恢复时对这两类文件进行完整性校验，封装在：redis-check-rdb.c和redis-check-aof.c
+      * 主从复制功能实现
+        * 主从复制功能在replication.c
+        * 在进行恢复时，主要依赖哨兵机制，实现在sentinel.c
+      * 集群实现高可扩展
+        * 通过Redis Cluster实现，在cluster.h/cluster.c
+    * 辅助功能
+      * 系统运维功能
+        * 查看不同操作的延迟产生来源，latency.h/latency.延迟监控
+        * 查看运行过慢的操作命令，slowlog.h/slowlog.c实现慢命令记录功能
+        * 性能评测功能，redis-benchmark.c
