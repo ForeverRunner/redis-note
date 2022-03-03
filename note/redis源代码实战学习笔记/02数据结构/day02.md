@@ -37,7 +37,16 @@
       * 以字符串追加为例子[sdscatlen](../../../src/sds.c)
         * 参数：目标字符串s,源字符串t,要追加的长度len
     * 紧凑型字符串结构的变成技巧
-      * 元数据flags表示SDS的类型
-        * 
+      * 元数据flags表示SDS的类型,事实上SDS一共设计了5种类型，分别是sdshdr5（不再使用）、sdshdr8、sdshdr16、sdshdr32和sdshdr64,区别在于：数据结构中的字符数组现有长度len和分配空间长度alloc,这两个元数据的数据类型不同
+      ```c
+        struct __atribute__ ((__packed__)) sdshdr8{
+            uint8_t len;/*字符数组的现有长度*/
+            uint8_t alloc;/*字符数组的已分配空间，不包括结构体和\0结束字符*/
+            unsigned char flags;/*SDS类型*/
+            char buff[];/*字符数组*/
+        };
+      ```
+      * SDS之所以
+
     
  
