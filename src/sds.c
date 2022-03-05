@@ -87,8 +87,8 @@ static inline char sdsReqType(size_t string_size) {
  * end of the string. However the string is binary safe and can contain
  * \0 characters in the middle, as the length is stored in the sds header. */
 sds sdsnewlen(const void *init, size_t initlen) {
-    void *sh;
-    sds s;
+    void *sh;//指向SDS结构体的指针
+    sds s;//SDS类型变量，即char*字符数组
     char type = sdsReqType(initlen);
     /* Empty strings are usually created in order to append. Use type 8
      * since type 5 is not good at this. */
@@ -97,13 +97,13 @@ sds sdsnewlen(const void *init, size_t initlen) {
     unsigned char *fp; /* flags pointer. */
 
     assert(hdrlen+initlen+1 > initlen); /* Catch size_t overflow */
-    sh = s_malloc(hdrlen+initlen+1);
+    sh = s_malloc(hdrlen+initlen+1);//新建sds结构，并分配内存空间
     if (init==SDS_NOINIT)
         init = NULL;
     else if (!init)
         memset(sh, 0, hdrlen+initlen+1);
     if (sh == NULL) return NULL;
-    s = (char*)sh+hdrlen;
+    s = (char*)sh+hdrlen;//sds类型变量指向SDS结构体重的buf数组，sh指向SDS结构体的起始位置，hdrlen是SDS结构体中元数据的长度
     fp = ((unsigned char*)s)-1;
     switch(type) {
         case SDS_TYPE_5: {
@@ -140,8 +140,8 @@ sds sdsnewlen(const void *init, size_t initlen) {
         }
     }
     if (initlen && init)
-        memcpy(s, init, initlen);
-    s[initlen] = '\0';
+        memcpy(s, init, initlen);//将要传入的字符串拷贝给SDS变量s
+    s[initlen] = '\0';//将变量s末尾增加、0.表示字符串结束
     return s;
 }
 
@@ -398,12 +398,16 @@ sds sdsgrowzero(sds s, size_t len) {
  * After the call, the passed sds string is no longer valid and all the
  * references must be substituted with the new pointer returned by the call. */
 sds sdscatlen(sds s, const void *t, size_t len) {
+    //获取目标字符串s的当前长度
     size_t curlen = sdslen(s);
-
+    //根据要追加的长度len何目标字符串s的现有长度，判断是否需要增加新的空间
     s = sdsMakeRoomFor(s,len);
     if (s == NULL) return NULL;
+    //将源字符串t中len长度的数据拷贝到目标字符串结尾
     memcpy(s+curlen, t, len);
+    //设置目标字符串的最新长度：拷贝前长度+拷贝长度
     sdssetlen(s, curlen+len);
+    //拷贝后，在目标字符串结尾加上\0
     s[curlen+len] = '\0';
     return s;
 }
