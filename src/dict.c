@@ -923,7 +923,7 @@ static int _dictExpandIfNeeded(dict *d)
 {
     /* Incremental rehashing already in progress. Return. */
     if (dictIsRehashing(d)) return DICT_OK;
-
+    //如果Hash表为空，将Hash表扩展为初始大小4
     /* If the hash table is empty expand it to the initial size. */
     if (d->ht[0].size == 0) return dictExpand(d, DICT_HT_INITIAL_SIZE);
 
@@ -931,6 +931,7 @@ static int _dictExpandIfNeeded(dict *d)
      * table (global setting) or we should avoid it but the ratio between
      * elements/buckets is over the "safe" threshold, we resize doubling
      * the number of buckets. */
+    //如果Hash表中的元素个数超过其当前大小，并且可以进行扩容，或者hash表中的元素个数已经是当前大小的5倍
     if (d->ht[0].used >= d->ht[0].size &&
         (dict_can_resize ||
          d->ht[0].used/d->ht[0].size > dict_force_resize_ratio))
@@ -991,11 +992,11 @@ void dictEmpty(dict *d, void(callback)(void*)) {
     d->rehashidx = -1;
     d->iterators = 0;
 }
-
+//启用rehash表功能
 void dictEnableResize(void) {
     dict_can_resize = 1;
 }
-
+//禁用rehash功能
 void dictDisableResize(void) {
     dict_can_resize = 0;
 }
