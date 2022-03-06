@@ -39,9 +39,13 @@
 /* ===================== Creation and parsing of objects ==================== */
 
 robj *createObject(int type, void *ptr) {
+    //给redisObject结构体分配空间
     robj *o = zmalloc(sizeof(*o));
+    //设置redisObject的类型
     o->type = type;
+    //设置redisObject的编码类型，此处时OBJ_ENCODING_RAW,表示常规的SDS
     o->encoding = OBJ_ENCODING_RAW;
+    //直接将传入的指针赋值给redisObject中的指针
     o->ptr = ptr;
     o->refcount = 1;
 
@@ -117,8 +121,10 @@ robj *createEmbeddedStringObject(const char *ptr, size_t len) {
  * we allocate as EMBSTR will still fit into the 64 byte arena of jemalloc. */
 #define OBJ_ENCODING_EMBSTR_SIZE_LIMIT 44
 robj *createStringObject(const char *ptr, size_t len) {
+    //创建嵌入式字符串，字符串长度小于等于44字节
     if (len <= OBJ_ENCODING_EMBSTR_SIZE_LIMIT)
         return createEmbeddedStringObject(ptr,len);
+    //创建普通字符串，字符串长度大于44字节
     else
         return createRawStringObject(ptr,len);
 }
