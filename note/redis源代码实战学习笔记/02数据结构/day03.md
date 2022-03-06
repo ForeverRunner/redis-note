@@ -67,6 +67,8 @@
           * 首先，该函数回执行一个循环，根据要进行拷贝的bucket的数量n，依次完成这些buckey内存所有key的迁移。如果ht[0]中的数据都已经迁移完成,键拷贝的循环也会停止执行
           * 在完成了n个bucket拷贝后，dictRehash函数第二部分逻辑，就是判断ht[0]表中数据是否都迁移完成，如果都迁移完成，ht[0]的空间会释放，然后将ht[1]赋值给ht[0]，以便其他部分的代码逻辑正常使用
           * 当ht[1]复制给ht[0]后，ht[1]的大小被重置为0，等待下一次rehash,全局哈希表中的rehashidx变量标为-1，标识rehash结束
-        * _dictRehashStep函数实现了每次只对一个bucket进行rehash
-          * 
+        * _dictRehashStep函数实现了每次只对一个bucket进行rehash[_dictReHashStep](img/_dictRehashStep.drawio)
+          * 其中dictAddRaw增加KV对
+          * dictGenericDelete删除键值对
+          * 这5个函数调用_dictRehashStep函数，给dictRehash传入的循环次数变量为1，每次迁移完成一个bucket，Hash表就会执行正常增删查改请求操作，在代码层面实现了渐进式rehash的方法
   
