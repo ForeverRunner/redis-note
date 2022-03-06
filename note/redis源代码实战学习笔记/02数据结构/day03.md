@@ -57,7 +57,16 @@
         * dictAdd：用来往Hash表中添加一个KV对
         * dictReplace:用来往Hash表中添加一个KV对，如果Key存在时，修改V
         * dictAddorFind:直接调用
-    * rehash扩容多大
-      * 
-    * rehash如何执行
+    * rehash扩容多大:通过调用**dictExpand**函数来完成的,```c int dictExpand(dict *d,unsigned long size);``` 参数有两个，要扩容的Hash表，要扩容到的容量
+      * 如果当前表的已用空间大小为size,就将表扩容到size*2的大小，而在dictExpand函数中，具体执行是由_dictNextPower函数完成的
+    * 渐进式rehash如何执行
+      * 为什么要实现渐进式Hash
+        * Hash表在执行rehash时，由于hash表空间扩大，原本映射到某一位置的key可能会被映射到新的位置上就会出现很多key拷贝到新的位置。在拷贝的过程，redis主线程无法执行其他请求，会被阻塞，就会产生rehash开销。渐进式rehash的意思就是：redis不会一次性把当前Hash表中所有的key都拷贝到新的位置，而是分批拷贝，每次的key拷贝只拷贝hash表中一个buckey中的哈希项，这样每次key拷贝的时常有限，对主线程影响也就有限
+      * 代码层面有两个关键函数dictRehash和_dictRehashStep
+        * dictRehash函数的整体逻辑包括两部分[执行逻辑](../../redis源代码实战学习笔记/02数据结构/img/dictRehash.drawio)
+          * 首先，该函数回执行一个循环，根据要进行拷贝的bucket的数量n，依次完成这些buckey内存所有key的迁移。如果ht[0]中的数据都已经迁移完成,键拷贝的循环也会停止执行
+          * 在完成了n个bucket拷贝后，dictRehash函数第二部分逻辑，就是判断ht[0]表中数据是否都迁移完成，如果都迁移完成，ht[0]的空间会释放，然后将ht[1]赋值给ht[0]，以便其他部分的代码逻辑正常使用
+          * 当ht[1]复制给ht[0]后，ht[1]的大小被重置为0，等待下一次rehash,全局哈希表中的rehashidx变量标为-1，标识rehash结束
+        * _dictRehashStep函数实现了每次只对一个bucket进行rehash
+          * 
   
