@@ -28,30 +28,30 @@
       * ht[0]的大小为0,扩容为初始大小4
       * ht[0]承载的元素个数超过了ht[0]的大小，同时Hash表可以进行扩容
       * ht[0]承载的元素个数是ht[0]的大小的dict_force_resize_ratio倍，其中dict_force_resize_ratio的默认值是5
-    ```c
-      /* Expand the hash table if needed */
-      static int _dictExpandIfNeeded(dict *d)
-      {
-          /* Incremental rehashing already in progress. Return. */
-          if (dictIsRehashing(d)) return DICT_OK;
-          //如果Hash表为空，将Hash表扩容为初始大小4
-          /* If the hash table is empty expand it to the initial size. */
-          if (d->ht[0].size == 0) return dictExpand(d, DICT_HT_INITIAL_SIZE);
+      ```c
+        /* Expand the hash table if needed */
+        static int _dictExpandIfNeeded(dict *d)
+        {
+            /* Incremental rehashing already in progress. Return. */
+            if (dictIsRehashing(d)) return DICT_OK;
+            //如果Hash表为空，将Hash表扩容为初始大小4
+            /* If the hash table is empty expand it to the initial size. */
+            if (d->ht[0].size == 0) return dictExpand(d, DICT_HT_INITIAL_SIZE);
 
-          /* If we reached the 1:1 ratio, and we are allowed to resize the hash
-          * table (global setting) or we should avoid it but the ratio between
-          * elements/buckets is over the "safe" threshold, we resize doubling
-          * the number of buckets. */
-          //如果Hash表中的元素个数超过其当前大小，并且可以进行扩容，或者hash表中的元素个数已经是当前大小的5倍
-          if (d->ht[0].used >= d->ht[0].size &&
-              (dict_can_resize ||
-              d->ht[0].used/d->ht[0].size > dict_force_resize_ratio))
-          {
-              return dictExpand(d, d->ht[0].used*2);
-          }
-          return DICT_OK;
-      }
-    ```
+            /* If we reached the 1:1 ratio, and we are allowed to resize the hash
+            * table (global setting) or we should avoid it but the ratio between
+            * elements/buckets is over the "safe" threshold, we resize doubling
+            * the number of buckets. */
+            //如果Hash表中的元素个数超过其当前大小，并且可以进行扩容，或者hash表中的元素个数已经是当前大小的5倍
+            if (d->ht[0].used >= d->ht[0].size &&
+                (dict_can_resize ||
+                d->ht[0].used/d->ht[0].size > dict_force_resize_ratio))
+            {
+                return dictExpand(d, d->ht[0].used*2);
+            }
+            return DICT_OK;
+        }
+      ```
       * 负载因子**loadFactor**（d->ht[0].used/d->ht[0].size)；判断是否进行rehash的条件，就是看loadFactor是否大于等于1和是否大于5,当loadFactor大于等于1时，还会判断**dict_can_resize**这个变量值。这个变量值是dictEnableResize和dictDisableResize两个函数中设置值，作用分别是启用和精致哈希表执行rehash的功能.这个函数又封装到[server.c](../../../src/server.c)**updateDictResizePolicy**函数中，用来启用或者禁用rehash扩容功能的。调用dictEnableResize的条件是：当前没有RDB子进程，并且也没有aof子进程。对应Redis没有执行RDB快照和没有进行AOF重写的场景
     * rehash扩容多大
       * 
