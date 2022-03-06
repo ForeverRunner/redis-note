@@ -13,7 +13,7 @@
 
 * redis如何实现rehash
   * rehash操作就是扩大Hash表空间
-  * redis准备了两个哈希表，用于rehash时交替保存数据[dict.h](../../src/dict.h)**#dict**
+  * redis准备了两个哈希表，用于rehash时交替保存数据[dict.h](../../../src/dict.h)**#dict**
     ```c 
       typedef struct dict{
         dictht ht[2];//两个hash表交替使用，用于rehash操作
@@ -24,7 +24,7 @@
   * 当进行rehash时，KV对被迁移到ht[1]中
   * 当迁移完成后，ht[0]的空间会被释放，并把ht[1]的地址赋值给ht[0],ht[1]的表大小设置为0，这样一来又回到了正常服务请求阶段，ht[0]接收和服务请求，ht[1]作为下一次rehash时的迁移表
   * rehash时要解决的问题
-    * 什么时候触发rehash，Redis用来判断是否出发rehash的函数是_dictExpandIfNeeded,_idctExpandIfNeeded定义了三个扩容条件
+    * 什么时候触发rehash，Redis用来判断是否出发rehash的函数是_dictExpandIfNeeded,_dictExpandIfNeeded定义了三个扩容条件:
       * ht[0]的大小为0,扩容为初始大小4
       * ht[0]承载的元素个数超过了ht[0]的大小，同时Hash表可以进行扩容
       * ht[0]承载的元素个数是ht[0]的大小的dict_force_resize_ratio倍，其中dict_force_resize_ratio的默认值是5
@@ -53,6 +53,10 @@
         }
       ```
       * 负载因子**loadFactor**（d->ht[0].used/d->ht[0].size)；判断是否进行rehash的条件，就是看loadFactor是否大于等于1和是否大于5,当loadFactor大于等于1时，还会判断**dict_can_resize**这个变量值。这个变量值是dictEnableResize和dictDisableResize两个函数中设置值，作用分别是启用和精致哈希表执行rehash的功能.这个函数又封装到[server.c](../../../src/server.c)**updateDictResizePolicy**函数中，用来启用或者禁用rehash扩容功能的。调用dictEnableResize的条件是：当前没有RDB子进程，并且也没有aof子进程。对应Redis没有执行RDB快照和没有进行AOF重写的场景
+      * _dictExpandIfNeeded是被_dictKeyIndex调用的，而_dictKeyIndex是被dictAddRaw调用，然后dictAddRaw会被三个函数调用，调用关系如下图:[img](../02数据结构/img/_dictExpandIfNeeded调用.drawio)
+        * dictAdd：用来往Hash表中添加一个KV对
+        * dictReplace:用来往Hash表中添加一个KV对，如果Key存在时，修改V
+        * dictAddorFind:直接调用
     * rehash扩容多大
       * 
     * rehash如何执行
