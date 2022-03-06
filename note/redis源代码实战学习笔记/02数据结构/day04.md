@@ -38,5 +38,7 @@
             * [createEmbeddedStringObject](../../../src/object.c):使用一块连续的内存空间，同时保存redisObject和SDS结构，内存分配只有一次，也避免了内存碎片```c robj *createEmbeddedStringObject(const char *ptr,size_t len)```,创建过程见[字符串创建流程](../02数据结构/img/day04.drawio)
 
         * 压缩列表和整数集合的设计
-          * List
+          * List、Hash和sort set这三种数据类型，都可以使用压缩列表(ziplist)来保存数据。压缩列表的函数定义和实现代码分别在[ziplist.h](../../../src/ziplist.h)和[ziplist.c](../../../src/ziplist.c)中
+          * 不过在ziplist.h文件没有压缩列表结构体的定义。压缩列表本身就是一块连续的内存空间，通过使用不同的编码来保存数据
+          * [ziplistNew](../../../src/ziplist.h)
     * 内存友好的数据使用方式
