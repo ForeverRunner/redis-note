@@ -86,8 +86,10 @@ robj *createRawStringObject(const char *ptr, size_t len) {
  * an object where the sds string is actually an unmodifiable string
  * allocated in the same chunk as the object itself. */
 robj *createEmbeddedStringObject(const char *ptr, size_t len) {
+    //1. 分配一块连续的内存空间，大小等于：redisObject结构体的大小+SDS结构头sdshdr8的大小+字符串的大小+1字节\0的大小
     robj *o = zmalloc(sizeof(robj)+sizeof(struct sdshdr8)+len+1);
-    struct sdshdr8 *sh = (void*)(o+1);
+    //2. 创建SDS结构的指针sh,并把sh指向连续空间中SDS结构头所在的位置
+    struct sdshdr8 *sh = (void*)(o+1);//移动的距离等于redisObject结构体大小
 
     o->type = OBJ_STRING;
     o->encoding = OBJ_ENCODING_EMBSTR;
@@ -105,7 +107,7 @@ robj *createEmbeddedStringObject(const char *ptr, size_t len) {
     if (ptr == SDS_NOINIT)
         sh->buf[len] = '\0';
     else if (ptr) {
-        memcpy(sh->buf,ptr,len);
+        memcpy(sh->buf,ptr,len);//把参数中传入的指针ptr指向的字符串，拷贝到sds结构体的字符数组，并在数组最后添加结束字符
         sh->buf[len] = '\0';
     } else {
         memset(sh->buf,0,len+1);

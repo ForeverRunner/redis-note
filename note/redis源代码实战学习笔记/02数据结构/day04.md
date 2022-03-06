@@ -34,5 +34,9 @@
           * createStringObject函数会根据要创建的字符串长度，决定具体调用哪个函数来完成创建
             * 对于createRawStringObject函数：创建string类型的值的时候，会调用createObject函数
               * createObject函数主要是用来创建Redis的数据对象的。因为Redis的数据对象有很多类型，比如String,List,Hash等，createObject函数两个参数中：一个是用来表示所要创建的数据对象类型，而另一个是指向数据对象的指针
-            * 创建字符串的流程[如图](../02数据结构/img/day04.drawio)
+            * 创建字符串的流程[如图](../02数据结构/img/day04.drawio),在创建普通字符串时，需要分别给redisObject和SDS分配一次内存，既带来了内存分配的开销，也导致内存碎片。因此当字符串小于等于44字节时，就使用嵌入式字符串
+            * [createEmbeddedStringObject](../../../src/object.c):使用一块连续的内存空间，同时保存redisObject和SDS结构，内存分配只有一次，也避免了内存碎片```c robj *createEmbeddedStringObject(const char *ptr,size_t len)```,创建过程见[字符串创建流程](../02数据结构/img/day04.drawio)
+
+        * 压缩列表和整数集合的设计
+          * List
     * 内存友好的数据使用方式
