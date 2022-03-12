@@ -52,11 +52,13 @@
           * 整数集合[intset.h](../../../src/intset.h)和[intset.c](../../../src/intset.c)
             * 整数集合作为底层结构实现set数据类型的
             * 整数集合也是一块连续的内存空间
-            * ```c typedef struct intset {
+            ```c 
+              typedef struct intset {
                   uint32_t encoding;
                   uint32_t length;
                   int8_t contents[];//整数数组避免内存碎片，提升了内存使用效率
-              } intset;```
+              } intset;
+              ```
 
     * 内存友好的数据使用方式
     * 节省内存的数据访问
