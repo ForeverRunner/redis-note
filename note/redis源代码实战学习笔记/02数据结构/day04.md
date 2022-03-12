@@ -40,5 +40,41 @@
         * 压缩列表和整数集合的设计
           * List、Hash和sort set这三种数据类型，都可以使用压缩列表(ziplist)来保存数据。压缩列表的函数定义和实现代码分别在[ziplist.h](../../../src/ziplist.h)和[ziplist.c](../../../src/ziplist.c)中
           * 不过在ziplist.h文件没有压缩列表结构体的定义。压缩列表本身就是一块连续的内存空间，通过使用不同的编码来保存数据
-          * [ziplistNew](../../../src/ziplist.h)
+          * [ziplistNew](../../../src/ziplist.h)，[内存布局如图](../02数据结构/img/ziplist.drawio)
+          * ziplist列表项包括三部分内容[zlentry](../02数据结构/img/ziplist.drawio)
+            * 前一项的长度(prevlen)
+              * ziplist在对prevlen进行编码时，会调用[zipStorePreEntryLength](../../../src/ziplist.c)函数
+            * 当前项长度信息的编码结果(encoding)
+              * encoding编码方法
+                * 一个列表项可以是整数或者字符串，整数可以是16，32，64位长度，字符串的长度也可以大小不一，针对整数和字符串就分别使用不同字节长度的编码结果[zipStoreEntryEncoding](../../../src/ziplist.c)
+                * 针对不同长度的数据，使用不同大小的元信息(prevlen和encoding),可以有效的节省内存开销。
+            * 当前项的实际数据(data)
+          * 整数集合[intset.h](../../../src/intset.h)和[intset.c](../../../src/intset.c)
+            * 整数集合作为底层结构实现set数据类型的
+            * 整数集合也是一块连续的内存空间
+            * ```c typedef struct intset {
+                  uint32_t encoding;
+                  uint32_t length;
+                  int8_t contents[];//整数数组避免内存碎片，提升了内存使用效率
+              } intset;```
+
     * 内存友好的数据使用方式
+    * 节省内存的数据访问
+      * 有些数据会被经常访问，比如常见的整数，redis协议中常见的回复消息(OK,ERR，PING,PONG),为了避免在内存中反复创建经常被访问的数据，redis采用了**共享对象**的设计思想。
+      * 在[server.c](../../../src/server.c)中createSharedObjects对象
+      * sharedObjectsStruct定义 
+      * ```c struct sharedObjectsStruct {
+          robj *crlf, *ok, *err, *emptybulk, *czero, *cone, *cnegone, *pong, *space,
+          *colon, *nullbulk, *nullmultibulk, *queued,
+          *emptymultibulk, *wrongtypeerr, *nokeyerr, *syntaxerr, *sameobjecterr,
+          *outofrangeerr, *noscripterr, *loadingerr, *slowscripterr, *bgsaveerr,
+          *masterdownerr, *roslaveerr, *execaborterr, *noautherr, *noreplicaserr,
+          *busykeyerr, *oomerr, *plus, *messagebulk, *pmessagebulk, *subscribebulk,
+          *unsubscribebulk, *psubscribebulk, *punsubscribebulk, *del, *unlink,
+          *rpop, *lpop, *lpush, *rpoplpush, *zpopmin, *zpopmax, *emptyscan,
+          *select[PROTO_SHARED_SELECT_CMDS],
+          *integers[OBJ_SHARED_INTEGERS],
+          *mbulkhdr[OBJ_SHARED_BULKHDR_LEN], /* "*<value>\r\n" */
+          *bulkhdr[OBJ_SHARED_BULKHDR_LEN];  /* "$<value>\r\n" */
+          sds minstring, maxstring;
+      };```
