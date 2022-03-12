@@ -64,17 +64,17 @@
       * 在[server.c](../../../src/server.c)中createSharedObjects对象
       * sharedObjectsStruct定义 
       * ```c struct sharedObjectsStruct {
-          robj *crlf, *ok, *err, *emptybulk, *czero, *cone, *cnegone, *pong, *space,
-          *colon, *nullbulk, *nullmultibulk, *queued,
-          *emptymultibulk, *wrongtypeerr, *nokeyerr, *syntaxerr, *sameobjecterr,
-          *outofrangeerr, *noscripterr, *loadingerr, *slowscripterr, *bgsaveerr,
-          *masterdownerr, *roslaveerr, *execaborterr, *noautherr, *noreplicaserr,
-          *busykeyerr, *oomerr, *plus, *messagebulk, *pmessagebulk, *subscribebulk,
-          *unsubscribebulk, *psubscribebulk, *punsubscribebulk, *del, *unlink,
-          *rpop, *lpop, *lpush, *rpoplpush, *zpopmin, *zpopmax, *emptyscan,
-          *select[PROTO_SHARED_SELECT_CMDS],
-          *integers[OBJ_SHARED_INTEGERS],
-          *mbulkhdr[OBJ_SHARED_BULKHDR_LEN], /* "*<value>\r\n" */
-          *bulkhdr[OBJ_SHARED_BULKHDR_LEN];  /* "$<value>\r\n" */
-          sds minstring, maxstring;
-      };```
+            robj *crlf, *ok, *err, *emptybulk, *czero, *cone, *cnegone, *pong, *space,
+            *colon, *nullbulk, *nullmultibulk, *queued,
+            *emptymultibulk, *wrongtypeerr, *nokeyerr, *syntaxerr, *sameobjecterr,
+            *outofrangeerr, *noscripterr, *loadingerr, *slowscripterr, *bgsaveerr,
+            *masterdownerr, *roslaveerr, *execaborterr, *noautherr, *noreplicaserr,
+            *busykeyerr, *oomerr, *plus, *messagebulk, *pmessagebulk, *subscribebulk,
+            *unsubscribebulk, *psubscribebulk, *punsubscribebulk, *del, *unlink,
+            *rpop, *lpop, *lpush, *rpoplpush, *zpopmin, *zpopmax, *emptyscan,
+            *select[PROTO_SHARED_SELECT_CMDS],
+            *integers[OBJ_SHARED_INTEGERS],
+            *mbulkhdr[OBJ_SHARED_BULKHDR_LEN], /* "*<value>\r\n" */
+            *bulkhdr[OBJ_SHARED_BULKHDR_LEN];  /* "$<value>\r\n" */
+            sds minstring, maxstring;
+          };```
