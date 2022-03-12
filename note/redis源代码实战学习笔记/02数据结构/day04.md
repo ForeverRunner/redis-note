@@ -63,7 +63,7 @@
       * 有些数据会被经常访问，比如常见的整数，redis协议中常见的回复消息(OK,ERR，PING,PONG),为了避免在内存中反复创建经常被访问的数据，redis采用了**共享对象**的设计思想。
       * 在[server.c](../../../src/server.c)中createSharedObjects对象
       * sharedObjectsStruct定义 
-      * ```c struct sharedObjectsStruct {
+        ```c struct sharedObjectsStruct {
             robj *crlf, *ok, *err, *emptybulk, *czero, *cone, *cnegone, *pong, *space,
             *colon, *nullbulk, *nullmultibulk, *queued,
             *emptymultibulk, *wrongtypeerr, *nokeyerr, *syntaxerr, *sameobjecterr,
