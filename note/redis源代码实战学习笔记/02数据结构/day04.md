@@ -77,4 +77,4 @@
             *mbulkhdr[OBJ_SHARED_BULKHDR_LEN], /* "*<value>\r\n" */
             *bulkhdr[OBJ_SHARED_BULKHDR_LEN];  /* "$<value>\r\n" */
             sds minstring, maxstring;
-          };```
+          };
