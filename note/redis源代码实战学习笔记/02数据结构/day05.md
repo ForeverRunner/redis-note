@@ -46,6 +46,7 @@
         * zslRandomLevel函数会初始化层数为节点的最小层数1，然后生成随机数，如果随机数小于0.25，层数+1，每增加一层的概率不会超过25%
 * 哈希表和跳表的组合使用
   * 当创建一个zset时候，使用dictCreate创建zset的哈希表，zslCreate创建跳表
-  * 添加元素时候，zsetAdd函数判定Sorted set使用ziplist还是skiplist的编码方式
-  * 如果zsetAdd通过dictFind函数发现元素已经存在，zsetAdd判断是否要增加函数的权重值
+  * 添加元素时候，zsetAdd函数判定Sorted set使用ziplist还是skiplist的编码方式（以skiplist为例子）
+    * 如果不存在，直接调用跳表元素插入函数zslInsert和哈希表插入函数dictAdd将新元素分别插入到跳表和哈希表中
+    * 如果zsetAdd通过dictFind函数发现元素已经存在，zsetAdd判断是否要增加函数的权重值，如果权重值发生变化，则zsetAdd函数就会调用zslUpdateScore函数，更新跳表中的权重值，紧接着zsetAdd函数会把哈希表中该元素(对应hash表中的key)的value指向跳表节点的权重值，这样，哈希表中元素的权重值就可以保持最新值了
 
