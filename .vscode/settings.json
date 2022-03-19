@@ -49,6 +49,7 @@
         "tuple": "c",
         "typeinfo": "c",
         "unordered_map": "c",
-        "vector": "c"
+        "vector": "c",
+        "stdio.h": "c"
     }
 }

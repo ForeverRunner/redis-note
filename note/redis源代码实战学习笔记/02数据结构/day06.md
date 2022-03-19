@@ -24,7 +24,7 @@
 * quicklist的设计与实现[quicklist.c](../../../src/quicklist.c)和[quicklist.h](../../../src/quicklist.h)
   * 一个quicklist就是一个链表，而链表中的每个元素又是一个ziplist
     * 首先quicklist元素的定义quicklistNode：
-    * ```c 
+    ```c 
         typedef struct quicklistNode {
             struct quicklistNode *prev;  /*指向前序节点的指针*/
             struct quicklistNode *next;  /*指向后续节点的指针*/
@@ -37,4 +37,18 @@
             unsigned int attempted_compress : 1; /* node can't compress; too small */
             unsigned int extra : 10; /* more bits to steal for future usage */
         } quicklistNode;
-    
+    ```
+    * quicklist的定义
+    ```C 
+        typedef struct quicklist {
+            quicklistNode *head;        /*指向头节点*/
+            quicklistNode *tail;        /*指向尾节点*/
+            unsigned long count;        /* total count of all entries in all ziplists */
+            unsigned long len;          /* number of quicklistNodes */
+            int fill : 16;              /* fill factor for individual nodes */
+            unsigned int compress : 16; /* depth of end nodes not to compress;0=off */
+        } quicklist;
+    ```
+    * quicklist插入元素流程：通过_quicklistNodeAllowInsert计算插入元素后的大小new_sz：quicklistNode的当前大小(node->sz)+插入元素的大小sz+插入元素后ziplist的prevlen占用大小，然后判断new_sz是否不超过8KB,或者单个ziplist里的元素个数是否满足要求，如果满足就在当前的quicklistNode中插入新的元素，否则会新建一个quicklistNode保存新插入的元素
+* listpack设计与实现[listpack.c](../../../src/listpack.c)和[listpack.h](../../../src/listpack.h)及[listpack_malloc.h](../../../src/listpack_malloc.h)
+  * 用一块连续的内存空间来紧凑地保存数据，是用了多种编码方式来表示不同长度的数据

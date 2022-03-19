@@ -71,8 +71,8 @@ typedef struct quicklistLZF {
  *                of quicklistNodes to leave uncompressed at ends of quicklist.
  * 'fill' is the user-requested (or default) fill factor. */
 typedef struct quicklist {
-    quicklistNode *head;
-    quicklistNode *tail;
+    quicklistNode *head;        /*指向头节点*/
+    quicklistNode *tail;        /*指向尾节点*/
     unsigned long count;        /* total count of all entries in all ziplists */
     unsigned long len;          /* number of quicklistNodes */
     int fill : 16;              /* fill factor for individual nodes */
