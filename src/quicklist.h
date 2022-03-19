@@ -42,9 +42,9 @@
  * attempted_compress: 1 bit, boolean, used for verifying during testing.
  * extra: 10 bits, free for future use; pads out the remainder of 32 bits */
 typedef struct quicklistNode {
-    struct quicklistNode *prev;
-    struct quicklistNode *next;
-    unsigned char *zl;
+    struct quicklistNode *prev;  /*指向前序节点的指针*/
+    struct quicklistNode *next;  /*指向后续节点的指针*/
+    unsigned char *zl;           /*指向ziplist的指针zl*/
     unsigned int sz;             /* ziplist size in bytes */
     unsigned int count : 16;     /* count of items in ziplist */
     unsigned int encoding : 2;   /* RAW==1 or LZF==2 */
