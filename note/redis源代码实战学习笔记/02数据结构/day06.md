@@ -52,3 +52,7 @@
     * quicklist插入元素流程：通过_quicklistNodeAllowInsert计算插入元素后的大小new_sz：quicklistNode的当前大小(node->sz)+插入元素的大小sz+插入元素后ziplist的prevlen占用大小，然后判断new_sz是否不超过8KB,或者单个ziplist里的元素个数是否满足要求，如果满足就在当前的quicklistNode中插入新的元素，否则会新建一个quicklistNode保存新插入的元素
 * listpack设计与实现[listpack.c](../../../src/listpack.c)和[listpack.h](../../../src/listpack.h)及[listpack_malloc.h](../../../src/listpack_malloc.h)
   * 用一块连续的内存空间来紧凑地保存数据，是用了多种编码方式来表示不同长度的数据
+  * LP_HDR_SIZE=32位总长度+16位置元素个数
+  * LP_EOF(结束标志)=1字节，存储的默认值为255
+  * 如何避免连锁更新
+    * 因为listpack每个列表项目只是记录当前项目的长度，在新增或者修改元素时，只会涉及每个列表项自己的操作，不会影响后续列表项的长度变化，避免了连锁更新
