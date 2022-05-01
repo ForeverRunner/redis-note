@@ -25,7 +25,7 @@
 5. poll机制与使用[poll.h](poll.h)
     * ```int poll(struct pollfd *__fds, nfds_t __nfds, int __timeout)```
     * *__fds是pollfd结构体数组、__nfds表示*__fds元素的个数,__timeout表示poll函数阻塞的超时时间
-    ```c struct pollfd {
+    ```struct pollfd {
         int     fd;//进行监听的描述符
         short   events;//要监听的事件类型
         short   revents;//实际发生的事件类型
