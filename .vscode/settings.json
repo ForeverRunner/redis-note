@@ -50,6 +50,9 @@
         "typeinfo": "c",
         "unordered_map": "c",
         "vector": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "select.h": "c",
+        "poll.h": "c",
+        "__threading_support": "c"
     }
 }
