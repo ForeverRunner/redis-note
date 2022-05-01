@@ -25,6 +25,8 @@
 5. poll机制与使用[poll.h](poll.h)
     * ```int poll(struct pollfd *__fds, nfds_t __nfds, int __timeout)```
     * *__fds是pollfd结构体数组、__nfds表示*__fds元素的个数,__timeout表示poll函数阻塞的超时时间
+
+
     ```struct pollfd {
         int     fd;//进行监听的描述符
         short   events;//要监听的事件类型
@@ -37,6 +39,6 @@
       * 循环调用poll函数，检测pollfd数组中是否有就绪的描述符
         * 如果连接套接字就绪，表明有客户端连接，可调用accept接受连接，并创建已连接套接字，并将其加入pollfd数组，并监听读事件
         * 如果是已连接套接字就绪，表明客户端有读写请求，调用recv/send函数处理读写请求
-6. epoll机制与使用[ae_poll.c](../../../src/ae_epoll.c)
+6. epoll机制与使用[ae_epoll.c](../../../src/ae_epoll.c)
 
      
