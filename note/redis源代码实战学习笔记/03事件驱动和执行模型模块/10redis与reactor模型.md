@@ -15,6 +15,32 @@
        * 当有读写请求时，reactor将读写事件交由handler处理
    * 事件驱动框架
      * 事件初始化
+       * 在服务器程序启动时就执行，作用时创建需要监听的事件类型，以及该事件对应的handler
      * 事件捕获、分发和处理循环
-
+   * reactor模型的基本工作机制：客户端的不同请求会在服务器端触发连接、读、写三类事件，这三类事件的监听、分发、处理是由reactor、acceptor、handler三类角色完成，这三类角色会通过事件驱动框架来实现交互和事件处理
 2. redis代码如何与reactor模型相对应
+   * 实现文件[ae.c](../../../src/ae.c),对应头文件[ae.h](../../../src/ae.h)
+   * redis在[ae.h](../../../src/ae.h)定义了事件的数据结构、框架主循环函数、事件捕获分发函数、事件和handler注册函数
+   * 事件数据结构的定义[aeFileEvent](../../../src/ae.h)
+     * redis定义了IO事件和时间事件，分别对应客户端发送的网络请求和redis自身的周期性操作
+     ```c
+          typedef struct aeFileEvent {
+              int mask; /* one of AE_(READABLE|WRITABLE|BARRIER) */
+              aeFileProc *rfileProc;//读事件处理还书，分发事件后调用
+              aeFileProc *wfileProc;//写事件处理函数，也就是handler
+              void *clientData;//指向client客户端私有数据的指针
+          } aeFileEvent;
+     ``` 
+     * mask用来表示事件类型的掩码，主要有AE_READABLE|AE_WRITEABLE|AE_BARRIER三类事件
+     * [主要函数](../../../src/ae.h)
+       * 框架主循环函数aeMain
+         * 在server.c中服务器程序初始化完成后、开始执行
+       * 负责事件捕获与分发的aeProcessEvents  
+         * 主要功能包括：捕获事件、判断事件类型和调用具体的事件处理函数，从而实现事件的处理
+       * 负责事件和handler注册的aeCreateFileEvent
+         * 事件注册：aeCreateFileEvent函数
+           * 当redis启动后在initServer函数中进行初始化，调用aeCreateFileEvent用于注册要监听的事件及相应事件处理函数
+           * initServer根据启用的ip端口个数为每个ip端口上的网络事件调用aeCreateFileEvent，创建对AE_READABLE事件监听，并且注册AE_READABLE事件的处理handler也就是acceptTcpHandler
+           * aeCreateFileEvent如何实现事件和处理函数的注册
+             * linux上提供了epoll_ctl API用于增加新的观察事件，redis在此基础上封装了aeApiAddEvent函数，对epoll_ctl调用
+     

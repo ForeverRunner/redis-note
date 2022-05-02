@@ -104,7 +104,7 @@ static void aeApiDelEvent(aeEventLoop *eventLoop, int fd, int mask) {
 static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
     aeApiState *state = eventLoop->apidata;
     int retval, numevents = 0;
-
+    //调用kevent获取监听到的事件
     if (tvp != NULL) {
         struct timespec timeout;
         timeout.tv_sec = tvp->tv_sec;
@@ -118,8 +118,9 @@ static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
 
     if (retval > 0) {
         int j;
-
+        //获取监听到的事件数量
         numevents = retval;
+        //针对每一个事件进行处理
         for(j = 0; j < numevents; j++) {
             int mask = 0;
             struct kevent *e = state->events+j;
