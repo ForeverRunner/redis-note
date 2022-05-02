@@ -63,23 +63,27 @@
 aeEventLoop *aeCreateEventLoop(int setsize) {
     aeEventLoop *eventLoop;
     int i;
-
+    //给eventLoop分配内存空间
     if ((eventLoop = zmalloc(sizeof(*eventLoop))) == NULL) goto err;
+    //给IO事件、已触发事件分配内存空间
     eventLoop->events = zmalloc(sizeof(aeFileEvent)*setsize);
     eventLoop->fired = zmalloc(sizeof(aeFiredEvent)*setsize);
     if (eventLoop->events == NULL || eventLoop->fired == NULL) goto err;
     eventLoop->setsize = setsize;
     eventLoop->lastTime = time(NULL);
+    //设置时间事件的链表头为NULL
     eventLoop->timeEventHead = NULL;
     eventLoop->timeEventNextId = 0;
     eventLoop->stop = 0;
     eventLoop->maxfd = -1;
     eventLoop->beforesleep = NULL;
     eventLoop->aftersleep = NULL;
+    //调用操作系统提供的多路复用函数
     if (aeApiCreate(eventLoop) == -1) goto err;
     /* Events with mask == AE_NONE are not set. So let's initialize the
      * vector with it. */
     for (i = 0; i < setsize; i++)
+        //将所有网络IO事件对应的文件描述符的掩码设置为AE_NONE
         eventLoop->events[i].mask = AE_NONE;
     return eventLoop;
 

@@ -34,8 +34,8 @@
 #include <sys/time.h>
 
 typedef struct aeApiState {
-    int kqfd;
-    struct kevent *events;
+    int kqfd;//epoll实例的描述符
+    struct kevent *events;//epoll_event结构体数组，记录监听事件
 } aeApiState;
 
 static int aeApiCreate(aeEventLoop *eventLoop) {

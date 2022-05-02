@@ -2067,7 +2067,7 @@ void initServer(void) {
 
     createSharedObjects();
     adjustOpenFilesLimit();
-    //创建事件循环框架
+    //创建事件循环框架,1000+32+96
     server.el = aeCreateEventLoop(server.maxclients+CONFIG_FDSET_INCR);
     if (server.el == NULL) {
         serverLog(LL_WARNING,

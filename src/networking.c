@@ -95,6 +95,7 @@ client *createClient(int fd) {
         anetEnableTcpNoDelay(NULL,fd);
         if (server.tcpkeepalive)
             anetKeepAlive(NULL,fd,server.tcpkeepalive);
+            //调用aeCreateFileEvent监听读事件，对应客户端读写请求，使用readQueryFromClient回调函数处理
         if (aeCreateFileEvent(server.el,fd,AE_READABLE,
             readQueryFromClient, c) == AE_ERR)
         {
